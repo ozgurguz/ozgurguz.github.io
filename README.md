@@ -1,23 +1,4 @@
-- [Interactive Storytelling](#interactive-storytelling)
-  - [Live Demo](#live demo)
-  - [Prerequisites](#prerequisites)
-  - [Getting Started](#getting-started)
-    - [Steps](#steps)
-    - [Generate Map Position Using `Helper.html`](#generate-map-position-using-helperhtml)
-    - [Configuration File and Layer Settings](#configuration-file-and-layer-settings)
-    - [Configuration Options](#configuration-options)
-    - [Mapbox Studio Style Configuration](#mapbox-studio-style-configuration)
-    - [Organization](#organization)
-  - [Deployment](#deployment)
-  - [Built With](#built-with)
-  - [Authors](#authors)
-  - [License](#license)
-  - [Acknowledgments](#acknowledgments)
 
-# Updated to Mapbox GL JS V2.0.0
-- Set `use3dTerrain: true` for 3D maps
-
-![3D mountains in Colorado](assets/co14ersstory.gif)
 
 # Interactive Storytelling
 Some stories are best told with a map. Data journalists covering changing conditions in a population's demographics, the environment, an international conflict, or telling a simple travel story frequently provide geographic context in their graphics.
@@ -274,37 +255,4 @@ Host the `index.html` and `config.js` files in the same directory in a web-acces
 - Mapbox GL JS
 - Scrollama.js
 
-## Authors
 
-John Branigan on the Mapbox [Solutions Architecture Team](mailto:solutions_architecture@mapbox.com)
-
-## License
-
-BSD 3-Clause License
-
-## Acknowledgments
-
-* Lo Bénichou for the idea, support, and awesome feedback throughout the design and build process
-* Paige Moody and Lem Thornton for early testing and feedback
-* Chris Toomey for ushering this work through and keeping things on track
-* Journalists with stories that help us make sense of what goes around us
-* [Digital Democracy](https://www.digital-democracy.org/) and [Rudo Kemper](https://kunukumapping.com/) for [their fork](https://github.com/digidem/mapbox-storytelling-upgraded) that inspired many later features.
-* [Paul Franz](https://github.com/pkfranz) for developing customizations and providing feedback.
-
-## Notable Examples
-
-- [Connectivity Disparity Across Schools in Kazakhstan: UNICEF](https://unicef.github.io/mapbox_analysis/story/map)
-- [Saving the Nile: Aljazeera](https://interactive.aljazeera.com/aje/2020/saving-the-nile/index.html)
-- [49 Mile Map: San Francisco Chronicle](https://projects.sfchronicle.com/total-sf/49-mile-map/)
-- [Dark Vessel Detection: ICEYE](https://www.iceye.com/use-cases/security/dark-vessel-detection/interactive-demo)
-- [Nuestro Territorio Es Nuestra Vida: Digital Democracy](http://lab.digital-democracy.org/mapa-sinangoe/)
-- [The Chinese Economic Footprint In Central And Eastern Europe: CSD](https://chinacapture.csd.bg/)
-- [Safe passages: Washington Post](https://www.washingtonpost.com/graphics/2020/climate-solutions/wyoming-wildlife-corridor/)
-- [Polar Star Inn and Seipel Hut: Huttrip](https://map.huttrip.com/ )
-- [Ten Conflicts to watch in 2022: Crisis Group](https://conflicts2022.crisisgroup.org/ )
-- [The Guiana Shield: The Amazon Conservation Team](https://www.amazonteam.org/maps/guiana-shield/)
-- [Watchlist 2021: International Rescue Committee](https://theirc.github.io/watchlist2021/)
-- [A River Drained: Kontinentalist](https://cdn-images.kontinentalist.com/static-html/food-security-mekong-river-hydropower-dam-climate-change/index.html)
-- [Climate Gentrification and its impact on New York City: Judy Huynh](https://www.climategentrification.info/)
-
-[mapbox.com/resources#solutions](https://www.mapbox.com/resources#solutions)
