@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Metni Maddeleştir ve Numaralandır</title>
+    <title>Metni Maddeleştir ve Sırala</title>
     <style>
         body {
             display: flex;
@@ -86,12 +87,29 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: none; /* Varsayılan olarak gizli */
         }
 
         #selectedItems p {
-            margin: 10px 0; /* Paragraflar arasına 1 satır (10px) mesafe eklendi */
+            margin: 10px 0;
             font-size: 16px;
             color: #333;
+        }
+
+        .copy-btn {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .copy-btn:hover {
+            background-color: #0056b3;
         }
 
         @media (max-width: 768px) {
@@ -119,7 +137,9 @@
     <textarea id="textInput" rows="15"></textarea><br>
     <button onclick="processText()">Maddeleştir</button>
     <div id="itemContainer"></div>
-    <div id="selectedItems"></div>
+    <div id="selectedItems">
+        <button class="copy-btn" onclick="copyToClipboard()">Kopyala</button>
+    </div>
 
     <script>
         let checkedItems = [];
@@ -130,7 +150,7 @@
             const container = document.getElementById('itemContainer');
             const selectedContainer = document.getElementById('selectedItems');
             container.innerHTML = '';
-            selectedContainer.innerHTML = ''; // Clear selected items display
+            selectedContainer.style.display = 'none'; // Başlangıçta gizle
             checkedItems = []; // Clear the tracking array
 
             lines.forEach((line, index) => {
@@ -188,14 +208,33 @@
 
         function updateSelectedItems() {
             const selectedContainer = document.getElementById('selectedItems');
-            selectedContainer.innerHTML = ''; // Clear the current list
+            selectedContainer.innerHTML = '<button class="copy-btn" onclick="copyToClipboard()">Kopyala</button>'; // Kopyala butonunu ekle
+            if (checkedItems.length === 0) {
+                selectedContainer.style.display = 'none'; // Hiç madde yoksa gizle
+            } else {
+                selectedContainer.style.display = 'block'; // Maddeler varsa göster
+                checkedItems.forEach(item => {
+                    const paragraph = document.createElement('p');
+                    paragraph.textContent = item.text;
+                    selectedContainer.appendChild(paragraph);
+                });
+            }
+        }
 
-            checkedItems.forEach(item => {
-                const paragraph = document.createElement('p');
-                paragraph.textContent = item.text;
-                selectedContainer.appendChild(paragraph);
+        function copyToClipboard() {
+            const selectedContainer = document.getElementById('selectedItems');
+            const copyButton = selectedContainer.querySelector('.copy-btn');
+            const textToCopy = Array.from(selectedContainer.getElementsByTagName('p'))
+                .map(paragraph => paragraph.textContent)
+                .join('\n');
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyButton.textContent = 'Kopyalandı';
+                setTimeout(() => {
+                    copyButton.textContent = 'Kopyala';
+                }, 200000); // 2 saniye sonra eski haline dön
             });
         }
     </script>
+    <img src="image/AA-logo.png">
 </body>
 </html>
