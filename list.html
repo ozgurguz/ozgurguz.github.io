@@ -1,6 +1,7 @@
-﻿<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Metni Maddeleştir ve Numaralandır</title>
     <style>
         body {
@@ -15,8 +16,8 @@
         }
 
         textarea {
-            width: 80%;
-            max-width: 600px;
+            width: 66%;
+            max-width: 800px;
             margin-bottom: 10px;
             padding: 10px;
             font-size: 16px;
@@ -42,8 +43,8 @@
         }
 
         #itemContainer {
-            width: 80%;
-            max-width: 600px;
+            width: 66%;
+            max-width: 800px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -62,9 +63,13 @@
         }
 
         .number {
-            margin-right: 10px;
+            margin-right: 20px;
             font-weight: bold;
             color: #4CAF50;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 20px;
         }
 
         label {
@@ -72,9 +77,27 @@
             color: #333;
         }
 
+        #selectedItems {
+            margin-top: 20px;
+            width: 66%;
+            max-width: 800px;
+            padding: 10px;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #selectedItems p {
+            margin: 10px 0; /* Paragraflar arasına 1 satır (10px) mesafe eklendi */
+            font-size: 16px;
+            color: #333;
+        }
+
         @media (max-width: 768px) {
             textarea {
                 font-size: 14px;
+                width: 90%;
             }
 
             button {
@@ -85,13 +108,18 @@
             .item {
                 padding: 8px;
             }
+
+            #selectedItems p {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
-    <textarea id="textInput" rows="10" placeholder="Metni buraya yapıştırın"></textarea><br>
+    <textarea id="textInput" rows="15"></textarea><br>
     <button onclick="processText()">Maddeleştir</button>
     <div id="itemContainer"></div>
+    <div id="selectedItems"></div>
 
     <script>
         let checkedItems = [];
@@ -100,7 +128,9 @@
             const text = document.getElementById('textInput').value;
             const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
             const container = document.getElementById('itemContainer');
+            const selectedContainer = document.getElementById('selectedItems');
             container.innerHTML = '';
+            selectedContainer.innerHTML = ''; // Clear selected items display
             checkedItems = []; // Clear the tracking array
 
             lines.forEach((line, index) => {
@@ -115,7 +145,7 @@
                 checkbox.type = 'checkbox';
                 checkbox.id = 'checkbox' + index;
                 checkbox.addEventListener('change', function () {
-                    handleCheckboxChange(index, checkbox.checked);
+                    handleCheckboxChange(index, line, checkbox.checked);
                 });
 
                 const label = document.createElement('label');
@@ -129,18 +159,19 @@
             });
         }
 
-        function handleCheckboxChange(index, isChecked) {
+        function handleCheckboxChange(index, text, isChecked) {
             if (isChecked) {
-                checkedItems.push(index);
+                checkedItems.push({ index, text });
             } else {
-                checkedItems = checkedItems.filter(item => item !== index);
+                checkedItems = checkedItems.filter(item => item.index !== index);
             }
             updateNumbers();
+            updateSelectedItems();
         }
 
         function updateNumbers() {
-            checkedItems.forEach((itemIndex, order) => {
-                const numberSpan = document.getElementById('number' + itemIndex);
+            checkedItems.forEach((item, order) => {
+                const numberSpan = document.getElementById('number' + item.index);
                 numberSpan.textContent = order + 1; // Assign sequential numbers based on order
             });
 
@@ -148,10 +179,21 @@
             const container = document.getElementById('itemContainer');
             const items = container.getElementsByClassName('item');
             Array.from(items).forEach((item, index) => {
-                if (!checkedItems.includes(index)) {
+                if (!checkedItems.find(checkedItem => checkedItem.index === index)) {
                     const numberSpan = document.getElementById('number' + index);
                     numberSpan.textContent = '';
                 }
+            });
+        }
+
+        function updateSelectedItems() {
+            const selectedContainer = document.getElementById('selectedItems');
+            selectedContainer.innerHTML = ''; // Clear the current list
+
+            checkedItems.forEach(item => {
+                const paragraph = document.createElement('p');
+                paragraph.textContent = item.text;
+                selectedContainer.appendChild(paragraph);
             });
         }
     </script>
