@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Metni Maddeleştir ve Numaralandır</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f7f9fc;
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            width: 80%;
+            max-width: 600px;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #itemContainer {
+            width: 80%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 10px;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .number {
+            margin-right: 10px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+
+        label {
+            flex-grow: 1;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            textarea {
+                font-size: 14px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            .item {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <textarea id="textInput" rows="10" placeholder="Metni buraya yapıştırın"></textarea><br>
+    <button onclick="processText()">Maddeleştir</button>
+    <div id="itemContainer"></div>
+
+    <script>
+        let checkedItems = [];
+
+        function processText() {
+            const text = document.getElementById('textInput').value;
+            const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+            const container = document.getElementById('itemContainer');
+            container.innerHTML = '';
+            checkedItems = []; // Clear the tracking array
+
+            lines.forEach((line, index) => {
+                const div = document.createElement('div');
+                div.className = 'item';
+
+                const numberSpan = document.createElement('span');
+                numberSpan.className = 'number';
+                numberSpan.id = 'number' + index;
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = 'checkbox' + index;
+                checkbox.addEventListener('change', function () {
+                    handleCheckboxChange(index, checkbox.checked);
+                });
+
+                const label = document.createElement('label');
+                label.htmlFor = 'checkbox' + index;
+                label.textContent = line;
+
+                div.appendChild(numberSpan);
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+        }
+
+        function handleCheckboxChange(index, isChecked) {
+            if (isChecked) {
+                checkedItems.push(index);
+            } else {
+                checkedItems = checkedItems.filter(item => item !== index);
+            }
+            updateNumbers();
+        }
+
+        function updateNumbers() {
+            checkedItems.forEach((itemIndex, order) => {
+                const numberSpan = document.getElementById('number' + itemIndex);
+                numberSpan.textContent = order + 1; // Assign sequential numbers based on order
+            });
+
+            // Clear numbers for unchecked items
+            const container = document.getElementById('itemContainer');
+            const items = container.getElementsByClassName('item');
+            Array.from(items).forEach((item, index) => {
+                if (!checkedItems.includes(index)) {
+                    const numberSpan = document.getElementById('number' + index);
+                    numberSpan.textContent = '';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
