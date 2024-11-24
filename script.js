@@ -75,7 +75,7 @@
   
           // Görseli indirilebilir yap
           const link = document.createElement("a");
-          link.download = "image_with_text.jpg";
+          link.download = "kart_kare.jpg";
           link.href = canvas.toDataURL("image/jpeg");
           link.click();
         };
