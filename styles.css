@@ -51,7 +51,7 @@
     text-align: left;
     white-space: pre-wrap;
     word-wrap: break-word;
-    line-height: 1; /* Varsayılan satır aralığı */
+    line-height: 1.1; /* Varsayılan satır aralığı */
   }
   
   .button-group {
