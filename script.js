@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Görseli indir
       const link = document.createElement("a");
-      link.download = "image_with_text.jpg";
+      link.download = "Kart_1080px.jpg";
       link.href = canvas.toDataURL("image/jpeg");
       link.click();
     };
