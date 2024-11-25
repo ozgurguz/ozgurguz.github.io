@@ -67,17 +67,28 @@ document.addEventListener("DOMContentLoaded", () => {
     backgroundImage.onload = () => {
       ctx.drawImage(backgroundImage, 0, 0, 1080, 1080);
 
-      // İlk metni çiz
-      ctx.font = `${parseFloat(window.getComputedStyle(document.querySelector(".text")).fontSize)}px 'Causten-Black'`;
-      ctx.fillStyle = document.querySelector(".text").style.color;
-      ctx.fillText(textInput.value, 57, 180);
+      // HTML'deki stilleri alarak canvas üzerinde aynı şekilde uygula
+      const textElement = document.querySelector(".text");
+      const textStyle = window.getComputedStyle(textElement);
 
-      // İsim çizimi
-      ctx.font = "30pt 'Roboto Slab-Bold'";
+      // İlk metni çiz
+      const fontSize = parseFloat(textStyle.fontSize);
+      ctx.font = `${fontSize}px ${textStyle.fontFamily}`;
+      ctx.fillStyle = textStyle.color;
+
+      // İlk metin için word wrapping
+      wrapText(ctx, textInput.value, 57, 260, 911, fontSize + 10); // Y koordinatını 260 olarak ayarladık
+
+      // İsim
+      const nameElement = document.querySelector(".name");
+      const nameStyle = window.getComputedStyle(nameElement);
+      ctx.font = `${nameStyle.fontSize} ${nameStyle.fontFamily}`;
       ctx.fillText(nameInput.value.toUpperCase(), 57, 914);
 
-      // Unvan çizimi
-      ctx.font = "24pt 'Roboto Slab-Light'";
+      // Unvan
+      const titleElement = document.querySelector(".title");
+      const titleStyle = window.getComputedStyle(titleElement);
+      ctx.font = `${titleStyle.fontSize} ${titleStyle.fontFamily}`;
       ctx.fillText(titleInput.value.toUpperCase(), 57, 944);
 
       // Görseli indir
@@ -87,4 +98,31 @@ document.addEventListener("DOMContentLoaded", () => {
       link.click();
     };
   });
+
+  /**
+   * Metni belirtilen sınırlar içinde kaydırır.
+   * @param {CanvasRenderingContext2D} ctx - Canvas'ın 2D bağlamı.
+   * @param {string} text - Çizilecek metin.
+   * @param {number} x - Başlangıç x koordinatı.
+   * @param {number} y - Başlangıç y koordinatı.
+   * @param {number} maxWidth - Metnin maksimum genişliği.
+   * @param {number} lineHeight - Her satır arasındaki mesafe.
+   */
+  function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+    const words = text.split(" ");
+    let line = "";
+    for (let n = 0; n < words.length; n++) {
+      const testLine = line + words[n] + " ";
+      const testWidth = ctx.measureText(testLine).width;
+
+      if (testWidth > maxWidth && n > 0) {
+        ctx.fillText(line, x, y);
+        line = words[n] + " ";
+        y += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    ctx.fillText(line, x, y);
+  }
 });
