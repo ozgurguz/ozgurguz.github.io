@@ -30,6 +30,7 @@
   }
   
   .image {
+    transform: scale(0.72);
     width: 1080px;
     height: 1080px;
     background-color: #ddd;
