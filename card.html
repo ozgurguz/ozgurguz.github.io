@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kare Kart</title>
+  <title>Dynamic Text Adjustment</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,6 +11,8 @@
     <div class="image-container">
       <div class="image">
         <div class="text"></div>
+        <div class="name"></div>
+        <div class="title"></div>
       </div>
       <div class="button-group">
         <button class="btn black" data-image="image/siyah.jpg" data-text-color="#FFFFFF">Siyah</button>
@@ -21,6 +23,10 @@
       <div class="adjustment-buttons">
         <button class="adjust-btn increase-font">Font +</button>
         <button class="adjust-btn decrease-font">Font -</button>
+      </div>
+      <div class="input-group">
+        <input type="text" class="name-input" placeholder="isim" value="RECEP TAYYİP ERDOĞAN" />
+        <input type="text" class="title-input" placeholder="unvan" value="CUMHURBAŞKANI" />
       </div>
       <button class="download-btn">JPG olarak indir</button>
     <p align="center">
