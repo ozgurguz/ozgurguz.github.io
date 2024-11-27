@@ -111,19 +111,19 @@ body {
   }
 
 .card:nth-child(1):before {
-  background-image: url('./photos/image1.jpg');
+  background-image: url('photos/image1.jpg');
 }
 
 .card:nth-child(2):before {
-  background-image: url('./photos/image2.jpg');
+  background-image: url('photos/image2.jpg');
 }
 
 .card:nth-child(3):before {
-  background-image: url('./photos/image3.jpg');
+  background-image: url('photos/image3.jpg');
 }
 
 .card:nth-child(4):before {
-  background-image: url('./photos/image4.jpg');
+  background-image: url('photos/image4.jpg');
 }
 
 .content {
