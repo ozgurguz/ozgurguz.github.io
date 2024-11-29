@@ -31,7 +31,7 @@ body {
   align-items: center;
   gap: 20px;
   overflow-y: auto; /* Dikey kaydırma */
-  padding-bottom: 120px; /* Footer için boşluk bırak */
+  padding-bottom: 200px; /* Footer için boşluk bırak */
 }
 
 .image-container {
