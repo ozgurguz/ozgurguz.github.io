@@ -276,19 +276,19 @@
             }
         }
 
-        function copyToClipboard() {
-            const selectedContainer = document.getElementById('selectedItems');
-            const copyButton = selectedContainer.querySelector('.copy-btn');
-            const textToCopy = Array.from(selectedContainer.getElementsByTagName('p'))
-                .map(paragraph => paragraph.textContent)
-                .join('\n');
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                copyButton.textContent = 'Kopyalandı';
-                setTimeout(() => {
-                    copyButton.textContent = 'Kopyala';
-                }, 200000); // 2 saniye sonra eski haline dön
-            });
-        }
+function copyToClipboard() {
+    const selectedContainer = document.getElementById('selectedItems');
+    const copyButton = selectedContainer.querySelector('.copy-btn');
+    const textToCopy = Array.from(selectedContainer.getElementsByTagName('p'))
+        .map(paragraph => paragraph.textContent) // Metinleri al
+        .join('\n\n'); // İki satır arasında boşluk ekle
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        copyButton.textContent = 'Kopyalandı'; // Buton metnini kalıcı olarak değiştir
+    }).catch(() => {
+        copyButton.textContent = 'Kopyalama Başarısız'; // Hata durumunda mesaj göster
+    });
+}
+
     </script>
 <footer>
   <div class="footer-buttons">
