@@ -174,21 +174,21 @@ footer {
   font-size: 14px;
   font-weight: bold;
   text-decoration: none;
-  color: #fff; /* Beyaz font rengi */
-  border-radius: 20px;
+  color: #6e6e6e;
+  border-radius: 5px;
   text-align: center;
 }
 
 .aa-btn {
-  background-color: #0033a1; /* Anadolu Ajansı buton rengi */
+  background-color: #ddd; /* Anadolu Ajansı buton rengi */
 }
 
 .ayrimcilik-btn {
-  background-color: #b92631; /* Ayrımcılık/Hattı buton rengi */
+  background-color: #ddd; /* Ayrımcılık/Hattı buton rengi */
 }
 
 .flash-btn {
-  background-color: #000; /* Flaşları sırala buton rengi */
+  background-color: #ddd; /* Flaşları sırala buton rengi */
 }
 
 .logo {
