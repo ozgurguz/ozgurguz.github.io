@@ -30,13 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // İsim alanını güncelleme
   nameInput.addEventListener("input", () => {
     const nameElement = document.querySelector(".name");
-    nameElement.textContent = nameInput.value.toUpperCase(); // Her zaman büyük harfe çevir
+    nameElement.textContent = nameInput.value.toLocaleUpperCase("tr"); // Her zaman büyük harfe çevir
   });
 
   // Unvan alanını güncelleme
   titleInput.addEventListener("input", () => {
     const titleElement = document.querySelector(".title");
-    titleElement.textContent = titleInput.value.toUpperCase(); // Her zaman büyük harfe çevir
+    titleElement.textContent = titleInput.value.toLocaleUpperCase("tr"); // Her zaman büyük harfe çevir
   });
 
   // Font büyütme/küçültme butonları
@@ -83,13 +83,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const nameElement = document.querySelector(".name");
       const nameStyle = window.getComputedStyle(nameElement);
       ctx.font = `${nameStyle.fontSize} ${nameStyle.fontFamily}`;
-      ctx.fillText(nameInput.value.toUpperCase(), 57, 914);
+      ctx.fillText(nameInput.value.toLocaleUpperCase("tr"), 57, 914);
 
       // Unvan
       const titleElement = document.querySelector(".title");
       const titleStyle = window.getComputedStyle(titleElement);
       ctx.font = `${titleStyle.fontSize} ${titleStyle.fontFamily}`;
-      ctx.fillText(titleInput.value.toUpperCase(), 57, 944);
+      ctx.fillText(titleInput.value.toLocaleUpperCase("tr"), 57, 944);
 
       // Görseli indir
       const link = document.createElement("a");
