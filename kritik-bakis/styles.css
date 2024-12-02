@@ -1,0 +1,203 @@
+@font-face {
+  font-family: "Tinos-Black";
+  src: url("fonts/Tinos-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Libre Franklin-Bold";
+  src: url("fonts/LibreFranklin-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Libre Franklin-Light";
+  src: url("fonts/LibreFranklin-Light.ttf") format("truetype");
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  overflow-y: auto; /* Dikey kaydırma */
+  padding-bottom: 200px; /* Footer için boşluk bırak */
+}
+
+.image-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.image {
+  transform: scale(0.72);
+  width: 1080px;
+  height: 1080px;
+  background-color: #ddd;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.text {
+  position: absolute;
+  top: 170px;
+  left: 75px;
+  width: 930px;
+  font-size: 77px;
+  font-family: "Tinos-Black", Arial, sans-serif;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.name {
+  position: absolute;
+  top: 940px;
+  left: 115px;
+  font-family: "Libre Franklin-Bold", Arial, sans-serif;
+  font-size: 24pt;
+  /* text-transform: uppercase; */
+  white-space: nowrap;
+}
+
+.title {
+  position: absolute;
+  top: 980px;
+  left: 115px;
+  font-family: "Libre Franklin-Light", Arial, sans-serif;
+  font-size: 20pt;
+  /*text-transform: uppercase;*/
+  white-space: nowrap;
+}
+
+.text-input {
+  width: 600px;
+  height: 100px;
+  padding: 10px;
+  font-size: 16px;
+  resize: none;
+}
+
+.adjustment-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.adjust-btn {
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+}
+
+.adjust-btn:hover {
+  background-color: #0056b3;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.name-input,
+.title-input {
+  width: 600px;
+  height: 40px;
+  padding: 10px;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.name-input:focus,
+.title-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+.download-btn {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #28a745;
+  color: #fff;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 100px; /* Footer yüksekliğini artırdık */
+  background-color: #f4f4f4;
+  display: flex;
+  flex-direction: column; /* Alt alta elemanlar */
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid #a51d20;
+  /* box-shadow: 0px -4px 1px rgba(165, 29, 32, 1);*/
+}
+
+.footer-buttons {
+  display: flex;
+  gap: 10px; /* Butonlar arası boşluk */
+  margin-bottom: 10px; /* Logoya olan mesafe */
+}
+
+.footer-btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #fff; /* Beyaz font rengi */
+  border-radius: 20px;
+  text-align: center;
+}
+
+.aa-btn {
+  background-color: #0033a1; /* Anadolu Ajansı buton rengi */
+}
+
+.ayrimcilik-btn {
+  background-color: #b92631; /* Ayrımcılık/Hattı buton rengi */
+}
+
+.flash-btn {
+  background-color: #000; /* Flaşları sırala buton rengi */
+}
+
+.logo {
+  width: 140px;
+  height: auto;
+  margin-bottom: 0px; /* Logonun versiyona olan mesafesi */
+}
+
+.version {
+  font-size: 14px;
+  color: #666;
+}
