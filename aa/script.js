@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ctx.fillStyle = textStyle.color;
 
       // İlk metin için word wrapping
-      wrapText(ctx, textInput.value, 57, 260, 911, fontSize + 10); // Y koordinatını 260 olarak ayarladık
+      wrapText(ctx, textInput.value, 57, 260, 911, fontSize + 9); // Y koordinatını 260 olarak ayarladık
 
       // İsim
       const nameElement = document.querySelector(".name");
