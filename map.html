@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Interactive Map with Sidebars</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.js"></script>
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+.rounded-rect {
+    background: rgb(0, 0, 0);
+    border-radius: 10px;
+    box-shadow: 0 0 50px -25px black;
+}
+
+.flex-center {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-center.left {
+    left: 0px;
+}
+
+.flex-center.right {
+    right: 0px;
+}
+
+.sidebar-content {
+    position: absolute;
+    width: 95%;
+    height: 95%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    color: gray;
+}
+
+.sidebar-toggle {
+    position: absolute;
+    width: 1.3em;
+    height: 1.3em;
+    overflow: visible;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebar-toggle.left {
+    right: -1.5em;
+    top: 10px;
+}
+
+.sidebar-toggle.right {
+    left: -1.5em;
+}
+
+.sidebar-toggle:hover {
+    color: #0aa1cf;
+    cursor: pointer;
+}
+
+.sidebar {
+    transition: transform 1s;
+    z-index: 1;
+    width: 300px;
+    height: 100%;
+}
+
+.left.collapsed {
+    transform: translateX(-295px);
+}
+
+.right.collapsed {
+    transform: translateX(295px);
+}
+</style>
+</head>
+<body>
+
+    <div id="map">
+        <div class="sidebar-toggle rounded-rect left" onclick="toggleSidebar('left')" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%);">⇥</div>
+        <div id="left" class="sidebar flex-center left collapsed">
+            <div class="sidebar-content rounded-rect flex-center" id="sidebar-content">
+                    
+                <div>
+                    <div style="margin-top: 20px;">İsim Soyisim</div>
+                    <div>Görevi: İnşaat mühendisi</div>
+                    <div style="margin-top: 20px;">
+                        Sosyal medya hesapları:<br>
+                        Instagram: <br>
+                        Facebook:
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div id="right" class="sidebar flex-center right collapsed">
+            <div class="sidebar-content rounded-rect flex-center">
+                Right Sidebar
+                <div class="sidebar-toggle rounded-rect right" onclick="toggleSidebar('right')">
+                    &larr;
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1Ijoib3pndXJndXoiLCJhIjoiY20xZ3Uwa2NmMDl4NDJ2c2FxM2MycGFveiJ9.pR2fPgfqBna7LB_5nhg3iw';
+const map = new mapboxgl.Map({
+    container: 'map',
+    zoom: 11,
+    pitch: 50,
+    bearing: 20,
+    center: [34.31027, 31.39640],
+    style: 'mapbox://styles/mapbox/light-v11'
+});
+
+const locations = [
+    { coordinates: [34.31027, 31.39640], text: "İsim Soyisim 1", image: "https://via.placeholder.com/150", video: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { coordinates: [34.32000, 31.40000], text: "İsim Soyisim 2", image: "https://via.placeholder.com/150", video: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { coordinates: [34.33000, 31.41000], text: "İsim Soyisim 3", image: "https://via.placeholder.com/150", video: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { coordinates: [34.26000, 31.34000], text: "İsim Soyisim 4", image: "https://via.placeholder.com/150", video: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { coordinates: [34.32000, 31.33000], text: "İsim Soyisim 5", image: "https://via.placeholder.com/150", video: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { coordinates: [34.31000, 31.36000], text: "İsim Soyisim 6", image: "https://via.placeholder.com/150", video: "https://www.w3schools.com/html/mov_bbb.mp4" }
+];
+
+locations.forEach((location, index) => {
+    // Create a red dot for each location
+    const markerElement = document.createElement('div');
+    markerElement.style.width = '10px';
+    markerElement.style.height = '10px';
+    markerElement.style.backgroundColor = 'red';
+    markerElement.style.borderRadius = '50%';
+
+    const marker = new mapboxgl.Marker({ element: markerElement })
+        .setLngLat(location.coordinates)
+        .addTo(map);
+
+    marker.getElement().addEventListener('click', () => {
+        // Update the sidebar with information about the clicked location
+        document.getElementById('sidebar-content').innerHTML = `
+            <div>
+                <div style="margin-left: 10px;">${location.text}</div>
+                <img src="${location.image}" alt="Location Image" style="width: 150px; height: auto; margin-top: 10px; margin-left: 10px;">
+                <video controls style="width: 100%; height: auto; margin-top: 10px;">
+                    <source src="${location.video}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="sidebar-toggle rounded-rect left" onclick="toggleSidebar('left')">&times;</div>
+            </div>
+        `;
+        const leftSidebar = document.getElementById('left');
+        if (leftSidebar.classList.contains('collapsed')) {
+            toggleSidebar('left');
+        }
+    });
+});
+
+function toggleSidebar(id) {
+    const elem = document.getElementById(id);
+    const collapsed = elem.classList.toggle('collapsed');
+    const padding = {};
+    padding[id] = collapsed ? 0 : 300;
+}
+
+
+</script>
+
+</body>
+</html>
