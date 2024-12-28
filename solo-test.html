@@ -1,0 +1,310 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Solo Test by Kuzi</title>
+  <style>
+    /* Basit bir sıfırlama */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+      background: #f4f4f4;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* Oyun tahtasını sarmalayan ana kapsayıcı */
+    #board {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      width: 100%;
+      max-width: 400px; /* Responsive için maks. genişlik */
+      gap: 5px;
+    }
+
+    /* Her bir hücre için stil */
+    .cell {
+      position: relative;
+      width: 100%;
+      padding-top: 100%; /* Kare görünüm elde etmek için */
+      background-color: #ddd;
+      cursor: pointer;
+      border-radius: 50%;
+      border: 1px solid #aaa;
+      transition: background-color 0.2s ease;
+    }
+
+    /* Geçersiz (oyun dışı) hücreleri kapatalım */
+    .invalid {
+      background-color: transparent;
+      border: none;
+      cursor: default;
+    }
+
+    /* Hücrede piyon varsa */
+    .cell.peg {
+      background-color: #5c9ded;
+    }
+
+    /* Seçili piyonun vurgusu */
+    .cell.selected {
+      background-color: #ffa600;
+    }
+
+    /* Hücre boşsa */
+    .cell.empty {
+      background-color: #ddd;
+    }
+
+    /* Başlık altındaki yönlendirme */
+    #info {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    /* Oyunun sonunda gösterilecek mesaj için basit stil */
+    #resultMessage {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #444;
+      text-align: center;
+      min-height: 40px; /* Mesaj alanı sabit kalsın diye */
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Solo Test (Acımasız)</h1>
+  <div id="info">Bir piyonu seçip (tıkla), boş bir deliğe geçerli bir hamle yapmaya çalış!</div>
+  <div id="board"></div>
+  <div id="resultMessage"></div> <!-- Oyun sonu mesajı buraya gelecek -->
+
+  <script>
+    // 7x7 İngiliz tahtası düzeni (33 geçerli hücre).
+    // null -> geçersiz alan
+    // 1    -> piyon var
+    // 0    -> boş
+    // Dizideki satır/sütun: board[row][col]
+    let boardLayout = [
+      [ null, null, 1,    1,    1,    null, null],
+      [ null, null, 1,    1,    1,    null, null],
+      [ 1,    1,    1,    1,    1,    1,    1   ],
+      [ 1,    1,    1,    0,    1,    1,    1   ],
+      [ 1,    1,    1,    1,    1,    1,    1   ],
+      [ null, null, 1,    1,    1,    null, null],
+      [ null, null, 1,    1,    1,    null, null]
+    ];
+
+    // Seçilmiş piyonun konumu (row, col) tutmak için
+    let selectedPeg = null;
+
+    const boardContainer = document.getElementById('board');
+    const resultMessage = document.getElementById('resultMessage');
+
+    // Tahtayı oluşturma
+    function createBoard() {
+      boardContainer.innerHTML = ''; // Temizle
+      for (let row = 0; row < 7; row++) {
+        for (let col = 0; col < 7; col++) {
+          const cellValue = boardLayout[row][col];
+          const cellDiv = document.createElement('div');
+          cellDiv.classList.add('cell');
+
+          // Eğer geçersiz (null) ise, ilgili hücreye 'invalid' ekleyelim
+          if (cellValue === null) {
+            cellDiv.classList.add('invalid');
+            cellDiv.style.pointerEvents = 'none'; // Tıklamayı kapatalım
+          } else {
+            // Piyon var mı?
+            if (cellValue === 1) {
+              cellDiv.classList.add('peg');
+            } else {
+              cellDiv.classList.add('empty');
+            }
+
+            // Tıklama (click) olayını ekleyelim
+            cellDiv.addEventListener('click', () => onCellClick(row, col));
+          }
+          // Board'a ekle
+          boardContainer.appendChild(cellDiv);
+        }
+      }
+    }
+
+    // Hücre tıklandığında çalışacak fonksiyon
+    function onCellClick(row, col) {
+      // Oyun zaten bitmişse tıklama işlemine gerek yok
+      if (isGameOver()) return;
+
+      // Eğer seçili bir piyon yoksa ve bu hücrede piyon varsa -> seç
+      if (!selectedPeg && boardLayout[row][col] === 1) {
+        selectedPeg = { row, col };
+        highlightSelected(row, col, true);
+        return;
+      }
+
+      // Eğer seçili bir piyon varsa:
+      if (selectedPeg) {
+        // Aynı hücreye tıklanırsa seçimi kaldır
+        if (selectedPeg.row === row && selectedPeg.col === col) {
+          highlightSelected(row, col, false);
+          selectedPeg = null;
+          return;
+        }
+
+        // Seçili piyon ile tıklanan hücreye geçerli bir hamle yapılıyor mu?
+        if (isValidMove(selectedPeg.row, selectedPeg.col, row, col)) {
+          // Hamleyi uygula
+          makeMove(selectedPeg.row, selectedPeg.col, row, col);
+        }
+        // Her durumda seçimi kapat
+        highlightSelected(selectedPeg.row, selectedPeg.col, false);
+        selectedPeg = null;
+
+        // Her hamleden sonra oyun bitti mi diye kontrol et
+        checkGameOver();
+      }
+    }
+
+    // Geçerli hamle kontrolü
+    function isValidMove(fromRow, fromCol, toRow, toCol) {
+      // 2 birim yatay veya dikey hareket (zıplama) kontrolü
+      const rowDiff = Math.abs(toRow - fromRow);
+      const colDiff = Math.abs(toCol - fromCol);
+
+      // Hamle yalnızca dikey veya yatay 2 birim uzaklığa olabilir
+      if ((rowDiff === 2 && colDiff === 0) || (rowDiff === 0 && colDiff === 2)) {
+        // Ortadaki hücrede (üzerinden atlanacak) piyon var mı?
+        const middleRow = (fromRow + toRow) / 2;
+        const middleCol = (fromCol + toCol) / 2;
+        
+        // Gitmek istediğimiz yer boş mu?
+        if (boardLayout[toRow][toCol] === 0 && boardLayout[middleRow][middleCol] === 1) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Hamleyi gerçekleştir
+    function makeMove(fromRow, fromCol, toRow, toCol) {
+      // Aradaki piyonun konumu
+      const middleRow = (fromRow + toRow) / 2;
+      const middleCol = (fromCol + toCol) / 2;
+
+      // Piyonları güncelle
+      boardLayout[fromRow][fromCol] = 0; // Kaynak artık boş
+      boardLayout[middleRow][middleCol] = 0; // Üzerinden atlanan piyon çıkar
+      boardLayout[toRow][toCol] = 1; // Hedefe piyon koy
+
+      // Tahtayı yeniden oluştur (güncel görünsün)
+      createBoard();
+    }
+
+    // Seçili piyonun hücresini CSS ile vurgula veya kaldır
+    function highlightSelected(row, col, highlight) {
+      const index = row * 7 + col; // Grid'de kaçıncı eleman olduğunu bulmak için
+      const cell = boardContainer.children[index];
+      if (highlight) {
+        cell.classList.add('selected');
+      } else {
+        cell.classList.remove('selected');
+      }
+    }
+
+    // Tahtada herhangi bir geçerli hamle var mı?
+    function isAnyMovePossible() {
+      // Tüm hücreleri dolaş
+      for (let r = 0; r < 7; r++) {
+        for (let c = 0; c < 7; c++) {
+          // Eğer bu hücrede piyon varsa
+          if (boardLayout[r][c] === 1) {
+            // Bu piyonun yapabileceği bir hamle var mı diye bak
+            // Potansiyel hedefler: (r +/- 2, c) veya (r, c +/- 2)
+            // 4 farklı yönü kontrol edelim
+            const possibleMoves = [
+              [r - 2, c], // yukarı
+              [r + 2, c], // aşağı
+              [r, c - 2], // sol
+              [r, c + 2], // sağ
+            ];
+
+            for (let [tr, tc] of possibleMoves) {
+              if (tr >= 0 && tr < 7 && tc >= 0 && tc < 7) {
+                if (isValidMove(r, c, tr, tc)) {
+                  return true; // Bir hamle bulduk
+                }
+              }
+            }
+          }
+        }
+      }
+      // Hiç geçerli hamle yok
+      return false;
+    }
+
+    // Tahtadaki toplam piyon (1) sayısını döndür
+    function getPegCount() {
+      let count = 0;
+      for (let r = 0; r < 7; r++) {
+        for (let c = 0; c < 7; c++) {
+          if (boardLayout[r][c] === 1) count++;
+        }
+      }
+      return count;
+    }
+
+    // Oyun bitmiş mi? Yani hiç hamle kalmadı mı?
+    function isGameOver() {
+      return !isAnyMovePossible();
+    }
+
+    // Oyun bittiğinde (hamle kalmadığında) kalan taş sayısına göre mesajı belirle
+    function checkGameOver() {
+      if (isGameOver()) {
+        const leftover = getPegCount();
+        let message = '';
+
+        switch (leftover) {
+          case 1:  message = 'Bilgin'; break;
+          case 2:  message = 'Zeki'; break;
+          case 3:  message = 'Kurnaz'; break;
+          case 4:  message = 'Başarılı'; break;
+          case 5:  message = 'Normal'; break;
+          case 6:  message = 'Tecrübesiz'; break;
+          case 7:  message = 'Aptal'; break;
+          case 8:  message = 'Gerizekalı'; break;
+          case 9:  message = 'Beyinsiz'; break;
+          default:
+            if (leftover >= 10) {
+              message = 'Balık kadar aklın yok senin dostum!';
+            }
+        }
+
+        // Mesajı ekrana yaz
+        resultMessage.textContent = `Oyun bitti! Kalan taş sayısı: ${leftover} — ${message}`;
+      }
+    }
+
+    // Sayfa yüklendiğinde tahtayı oluştur
+    createBoard();
+  </script>
+</body>
+</html>
