@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>Ankara Hava Kirliliği Haritası</title>
+  <!-- Leaflet.js CSS ve JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <style>
+    #map { height: 500px; width: 100%; } /* Harita boyutunu ayarla */
+    .legend { padding: 10px; background: white; border-radius: 5px; }
+    .legend i { width: 20px; height: 20px; display: inline-block; margin-right: 5px; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script>
+    // Ankara koordinatları (Merkez)
+    const map = L.map('map').setView([39.9334, 32.8597], 11); // Zoom seviyesi: 11
+
+    // OpenStreetMap tile'ları
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Renk kodları ve semt verileri
+    const semtler = [
+      { ad: "Çankaya", pm: 55.5, latlng: [39.8875, 32.8628], renk: "#ffa500" },
+      { ad: "Bahçelievler & Ulus", pm: 57.0, latlng: [39.9342, 32.8544], renk: "#ffa500" },
+      { ad: "Batıkent", pm: 52.5, latlng: [39.9667, 32.7333], renk: "#ffa500" },
+      { ad: "Keçiören Sanatoryum", pm: 51.0, latlng: [39.9764, 32.8536], renk: "#ffa500" }
+    ];
+
+    // Semtleri haritaya ekle
+    semtler.forEach(semt => {
+      L.circleMarker(semt.latlng, {
+        color: "#009688", // Turkuaz border
+        fillColor: semt.renk,
+        fillOpacity: 0.8,
+        radius: 12
+      }).bindPopup(`<b>${semt.ad}</b><br>PM: ${semt.pm} µg/m³<br>Seviye: Hassas`).addTo(map);
+    });
+
+    // Renk lejantı ekle
+    const legend = L.control({ position: "bottomright" });
+    legend.onAdd = () => {
+      const div = L.DomUtil.create("div", "legend");
+      div.innerHTML = `
+        <h4>Hava Kalitesi</h4>
+        <i style="background:#ffa500"></i>Hassas (101-150)<br>
+        <i style="background:#ff0000"></i>Sağlıksız (151-200)<br>
+        <i style="background:#800080"></i>Kötü (201-300)
+      `;
+      return div;
+    };
+    legend.addTo(map);
+  </script>
+</body>
+</html>
