@@ -11,6 +11,10 @@
       font-family: "Causten-Black";
       src: url("fonts/Causten-Black.ttf") format("truetype");
     }
+    @font-face {
+    font-family: "Causten-Regular";
+    src: url("causten-regular.ttf") format("truetype");
+    }
     body {
       margin: 0;
       padding: 0;
@@ -105,7 +109,7 @@
 
       // Yer isminin etiketini, epicenter'in üzerinde (tek satır, büyük puntolu) konumlandırıyoruz.
       var labelIcon = L.divIcon({
-        html: '<div style="font-family: \'Causten-Black\'; font-size: 24px; font-weight: bold; color: white; background: red; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, -200%); white-space: nowrap; line-height: 1; margin: 0;">' + locationText + '</div>',
+        html: '<div style="font-family: \'Causten-Regular\'; font-size: 24px; font-weight: bold; color: white; background: red; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, -200%); white-space: nowrap; line-height: 1; margin: 0;">' + locationText + '</div>',
         className: '',
         iconSize: [0, 0]
       });
