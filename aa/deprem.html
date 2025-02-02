@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Deprem Haritası - Uydu Görünümü</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+    #form-container {
+      padding: 10px;
+      background: #f5f5f5;
+      border-bottom: 1px solid #ccc;
+    }
+    #form-container form label {
+      margin-right: 10px;
+    }
+    #form-container form input {
+      margin-right: 5px;
+    }
+    #download-btn {
+      margin-top: 10px;
+    }
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="form-container">
+    <form id="quake-form">
+      <label>
+        Enlem: 
+        <input type="number" step="any" id="latitude" placeholder="Örn: 38.4237" required>
+      </label>
+      <label>
+        Boylam: 
+        <input type="number" step="any" id="longitude" placeholder="Örn: 27.1428" required>
+      </label>
+      <label>
+        Deprem Şiddeti: 
+        <input type="number" step="any" id="magnitude" placeholder="Örn: 5.6" required>
+      </label>
+      <label>
+        Yer: 
+        <input type="text" id="location" placeholder="Örn: Aydın" required>
+      </label>
+      <button type="submit">Haritada Göster</button>
+    </form>
+  </div>
+
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- html2canvas JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    // Uydu görünümü için Esri World Imagery kullanıyoruz.
+    var map = L.map('map', { attributionControl: false }).setView([39, 35], 5);
+
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: 'Tiles &copy; Esri'
+    }).addTo(map);
+
+    // Marker ve etiketlerin referanslarını tutan değişkenler
+    var epicenterMarker, circle1, circle2, circle3, circle4, circle5, labelMarker, magnitudeMarker;
+
+    function addEarthquakeMarkers(lat, lon, magnitude, locationText) {
+      // Önceki işaretlemeleri temizleyelim
+      if (epicenterMarker) map.removeLayer(epicenterMarker);
+      if (circle1) map.removeLayer(circle1);
+      if (circle2) map.removeLayer(circle2);
+      if (circle3) map.removeLayer(circle3);
+      if (circle4) map.removeLayer(circle4);
+      if (circle5) map.removeLayer(circle5);
+      if (labelMarker) map.removeLayer(labelMarker);
+      if (magnitudeMarker) map.removeLayer(magnitudeMarker);
+
+      // Depremin merkez üssünü gösteren kırmızı nokta (epicenter)
+      epicenterMarker = L.circleMarker([lat, lon], {
+        radius: 6,
+        color: 'red',
+        fillColor: 'red',
+        fillOpacity: 1
+      }).addTo(map);
+
+      // 20 km, 40 km ve 60 km yarıçaplı geniş daireler
+      circle1 = L.circle([lat, lon], { radius: 20000, color: 'red', weight: 3, opacity: 1, fill: false }).addTo(map);
+      circle2 = L.circle([lat, lon], { radius: 40000, color: 'red', weight: 2, opacity: 0.9, fill: false }).addTo(map);
+      circle3 = L.circle([lat, lon], { radius: 70000, color: 'red', weight: 2, opacity: 0.75, fill: false }).addTo(map);
+      circle4 = L.circle([lat, lon], { radius: 120000, color: 'red', weight: 2, opacity: 0.55, fill: false }).addTo(map);
+      circle5 = L.circle([lat, lon], { radius: 200000, color: 'red', weight: 2, opacity: 0.3, fill: false }).addTo(map);
+
+      // Yer isminin etiketini, epicenter'in üzerinde (tek satır, büyük puntolu) konumlandırıyoruz.
+      var labelIcon = L.divIcon({
+        html: '<div style="font-size: 24px; font-weight: bold; color: white; background: red; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, -200%); white-space: nowrap; line-height: 1; margin: 0;">' + locationText + '</div>',
+        className: '',
+        iconSize: [0, 0]
+      });
+      labelMarker = L.marker([lat, lon], { icon: labelIcon, interactive: false }).addTo(map);
+
+
+      // Deprem büyüklüğünü, kırmızı arka plan üzerinde beyaz, dikdörtgen biçimde gösteren etiket
+      var magnitudeIcon = L.divIcon({
+        html: '<div style="font-size: 40px; font-weight: bold; color: red; background: white; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, 80%); white-space: nowrap; line-height: 1; margin: 0;">' + magnitude + '</div>',
+        className: '',
+        iconSize: [0, 0]
+      });
+      magnitudeMarker = L.marker([lat, lon], { icon: magnitudeIcon, interactive: false }).addTo(map);
+
+      // Harita merkezini depremin merkez üssüne getirip, 100 km yarıçaplı alanı gösterecek şekilde ayarlıyoruz.
+      var bounds = L.circle([lat, lon], { radius: 100000 }).getBounds();
+      map.fitBounds(bounds);
+    }
+
+    // Form gönderildiğinde, girilen koordinat, büyüklük ve yer bilgisine göre işaretlemeler eklenir.
+    document.getElementById('quake-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var lat = parseFloat(document.getElementById('latitude').value);
+      var lon = parseFloat(document.getElementById('longitude').value);
+      var magnitude = document.getElementById('magnitude').value;
+      var locationText = document.getElementById('location').value;
+      addEarthquakeMarkers(lat, lon, magnitude, locationText);
+    });
+
+  </script>
+</body>
+</html>
