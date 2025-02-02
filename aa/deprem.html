@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
@@ -7,6 +7,10 @@
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
+    @font-face {
+      font-family: "Causten-Black";
+      src: url("fonts/Causten-Black.ttf") format("truetype");
+    }
     body {
       margin: 0;
       padding: 0;
@@ -92,29 +96,29 @@
         fillOpacity: 1
       }).addTo(map);
 
-      // 20 km, 40 km ve 60 km yarıçaplı geniş daireler
+      // 20 km, 40 km, 70 km, 120 km ve 200 km yarıçaplı geniş daireler
       circle1 = L.circle([lat, lon], { radius: 20000, color: 'red', weight: 3, opacity: 1, fill: false }).addTo(map);
       circle2 = L.circle([lat, lon], { radius: 40000, color: 'red', weight: 2, opacity: 0.9, fill: false }).addTo(map);
       circle3 = L.circle([lat, lon], { radius: 70000, color: 'red', weight: 2, opacity: 0.75, fill: false }).addTo(map);
       circle4 = L.circle([lat, lon], { radius: 120000, color: 'red', weight: 2, opacity: 0.55, fill: false }).addTo(map);
       circle5 = L.circle([lat, lon], { radius: 200000, color: 'red', weight: 2, opacity: 0.3, fill: false }).addTo(map);
 
-      // Yer isminin etiketini, epicenter'in üzerinde (tek satır, büyük puntolu) konumlandırıyoruz.
-      var labelIcon = L.divIcon({
-        html: '<div style="font-size: 24px; font-weight: bold; color: white; background: red; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, -200%); white-space: nowrap; line-height: 1; margin: 0;">' + locationText + '</div>',
-        className: '',
-        iconSize: [0, 0]
-      });
-      labelMarker = L.marker([lat, lon], { icon: labelIcon, interactive: false }).addTo(map);
+// Yer isminin etiketini, epicenter'in üzerinde (tek satır, büyük puntolu) konumlandırıyoruz.
+var labelIcon = L.divIcon({
+  html: '<div style="font-family: \'Causten-Black\'; font-size: 24px; font-weight: bold; color: white; background: red; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, -200%); white-space: nowrap; line-height: 1; margin: 0;">' + locationText + '</div>',
+  className: '',
+  iconSize: [0, 0]
+});
+labelMarker = L.marker([lat, lon], { icon: labelIcon, interactive: false }).addTo(map);
 
+// Deprem büyüklüğünü, kırmızı arka plan üzerinde beyaz, dikdörtgen biçimde gösteren etiket
+var magnitudeIcon = L.divIcon({
+  html: '<div style="font-family: \'Causten-Black\'; font-size: 40px; font-weight: bold; color: red; background: white; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, 80%); white-space: nowrap; line-height: 1; margin: 0;">' + magnitude + '</div>',
+  className: '',
+  iconSize: [0, 0]
+});
+magnitudeMarker = L.marker([lat, lon], { icon: magnitudeIcon, interactive: false }).addTo(map);
 
-      // Deprem büyüklüğünü, kırmızı arka plan üzerinde beyaz, dikdörtgen biçimde gösteren etiket
-      var magnitudeIcon = L.divIcon({
-        html: '<div style="font-size: 40px; font-weight: bold; color: red; background: white; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, 80%); white-space: nowrap; line-height: 1; margin: 0;">' + magnitude + '</div>',
-        className: '',
-        iconSize: [0, 0]
-      });
-      magnitudeMarker = L.marker([lat, lon], { icon: magnitudeIcon, interactive: false }).addTo(map);
 
       // Harita merkezini depremin merkez üssüne getirip, 100 km yarıçaplı alanı gösterecek şekilde ayarlıyoruz.
       var bounds = L.circle([lat, lon], { radius: 100000 }).getBounds();
@@ -130,7 +134,6 @@
       var locationText = document.getElementById('location').value;
       addEarthquakeMarkers(lat, lon, magnitude, locationText);
     });
-
   </script>
 </body>
 </html>
