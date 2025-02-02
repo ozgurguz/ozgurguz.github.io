@@ -103,22 +103,21 @@
       circle4 = L.circle([lat, lon], { radius: 120000, color: 'red', weight: 2, opacity: 0.55, fill: false }).addTo(map);
       circle5 = L.circle([lat, lon], { radius: 200000, color: 'red', weight: 2, opacity: 0.3, fill: false }).addTo(map);
 
-// Yer isminin etiketini, epicenter'in üzerinde (tek satır, büyük puntolu) konumlandırıyoruz.
-var labelIcon = L.divIcon({
-  html: '<div style="font-family: \'Causten-Black\'; font-size: 24px; font-weight: bold; color: white; background: red; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, -200%); white-space: nowrap; line-height: 1; margin: 0;">' + locationText + '</div>',
-  className: '',
-  iconSize: [0, 0]
-});
-labelMarker = L.marker([lat, lon], { icon: labelIcon, interactive: false }).addTo(map);
+      // Yer isminin etiketini, epicenter'in üzerinde (tek satır, büyük puntolu) konumlandırıyoruz.
+      var labelIcon = L.divIcon({
+        html: '<div style="font-family: \'Causten-Black\'; font-size: 24px; font-weight: bold; color: white; background: red; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, -200%); white-space: nowrap; line-height: 1; margin: 0;">' + locationText + '</div>',
+        className: '',
+        iconSize: [0, 0]
+      });
+      labelMarker = L.marker([lat, lon], { icon: labelIcon, interactive: false }).addTo(map);
 
-// Deprem büyüklüğünü, kırmızı arka plan üzerinde beyaz, dikdörtgen biçimde gösteren etiket
-var magnitudeIcon = L.divIcon({
-  html: '<div style="font-family: \'Causten-Black\'; font-size: 40px; font-weight: bold; color: red; background: white; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, 80%); white-space: nowrap; line-height: 1; margin: 0;">' + magnitude + '</div>',
-  className: '',
-  iconSize: [0, 0]
-});
-magnitudeMarker = L.marker([lat, lon], { icon: magnitudeIcon, interactive: false }).addTo(map);
-
+      // Deprem büyüklüğünü, kırmızı arka plan üzerinde beyaz, dikdörtgen biçimde gösteren etiket
+      var magnitudeIcon = L.divIcon({
+        html: '<div style="font-family: \'Causten-Black\'; font-size: 40px; font-weight: bold; color: red; background: white; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, 80%); white-space: nowrap; line-height: 1; margin: 0;">' + magnitude + '</div>',
+        className: '',
+        iconSize: [0, 0]
+      });
+      magnitudeMarker = L.marker([lat, lon], { icon: magnitudeIcon, interactive: false }).addTo(map);
 
       // Harita merkezini depremin merkez üssüne getirip, 100 km yarıçaplı alanı gösterecek şekilde ayarlıyoruz.
       var bounds = L.circle([lat, lon], { radius: 100000 }).getBounds();
