@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -20,6 +21,7 @@
       padding: 0;
       font-family: sans-serif;
     }
+    /* Form kapsayıcısı (diğer form elemanları merkezde kalacak) */
     #form-container {
       position: absolute;
       top: 0;
@@ -41,15 +43,30 @@
     #download-btn {
       margin-top: 10px;
     }
-    /* AFAD butonunun stil ayarları */
+    /* "AFAD son depremler" butonunu sayfanın sol üst köşesine taşımak için */
     #afad-btn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
       background-color: #0033a1;
       color: #FFFFFF;
       border: none;
       padding: 5px 10px;
-      margin-left: 10px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 12px;
+      border-radius: 4px;
+      z-index: 1100; /* Form kapsayıcısından üstte olması için */
+    }
+    /* Haritada göster butonunun stil ayarları */
+    #show-btn {
+      background-color: #000;
+      color: #FFFFFF;
+      border: none;
+      padding: 5px 10px;
+      margin-left: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      border-radius: 4px;
     }
     #map {
       height: 100vh;
@@ -58,26 +75,24 @@
   </style>
 </head>
 <body>
+  <!-- "AFAD son depremler" butonu form dışında da olabilir, ancak burada form içerisinde yer alıyor.
+       CSS ile konumu sabitlendiği için sol üstte görünecektir. -->
   <div id="form-container">
     <form id="quake-form">
-      <label>
-        Enlem: 
-        <input type="number" step="any" id="latitude" placeholder="Örn: 38.4237" required>
-      </label>
-      <label>
-        Boylam: 
-        <input type="number" step="any" id="longitude" placeholder="Örn: 27.1428" required>
-      </label>
-      <label>
-        Deprem Şiddeti: 
-        <input type="number" step="any" id="magnitude" placeholder="Örn: 5.6" required>
-      </label>
-      <label>
-        Yer: 
-        <input type="text" id="location" placeholder="Örn: Aydın" required>
-      </label>
-      <button type="submit">Haritada Göster</button>
       <button type="button" id="afad-btn">AFAD son depremler</button>
+      <label>
+        <input type="number" step="any" id="latitude" placeholder="Enlem" required>
+      </label>
+      <label>
+        <input type="number" step="any" id="longitude" placeholder="Boylam" required>
+      </label>
+      <label>
+        <input type="number" step="any" id="magnitude" placeholder="Büyüklük" required>
+      </label>
+      <label>
+        <input type="text" id="location" placeholder="Yer" required>
+      </label>
+      <button type="submit" id="show-btn">Haritada Göster</button>
     </form>
   </div>
 
