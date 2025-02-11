@@ -52,6 +52,20 @@
     #afad-btn {
       position: fixed;
       top: 10px;
+      right: 70px;
+      background-color: #0033a1;
+      color: #FFFFFF;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      border-radius: 4px;
+      z-index: 1100; /* Form kapsayıcısından üstte olması için */
+    }
+    /* "USGS son depremler" butonunu sayfanın sol üst köşesine taşımak için */
+    #usgs-btn {
+      position: fixed;
+      top: 10px;
       right: 10px;
       background-color: #0033a1;
       color: #FFFFFF;
@@ -80,11 +94,12 @@
   </style>
 </head>
 <body>
-  <!-- "AFAD son depremler" butonu form dışında da olabilir, ancak burada form içerisinde yer alıyor.
+  <!-- "AFAD ve USGS son depremler" butonu form dışında da olabilir, ancak burada form içerisinde yer alıyor.
        CSS ile konumu sabitlendiği için sol üstte görünecektir. -->
   <div id="form-container">
     <form id="quake-form">
-      <button type="button" id="afad-btn">AFAD son depremler</button>
+      <button type="button" id="afad-btn">AFAD</button>
+      <button type="button" id="usgs-btn">USGS</button>  
       <label>
         <input type="number" step="any" id="latitude" placeholder="Enlem" required>
       </label>
@@ -185,6 +200,11 @@
     // "AFAD son depremler" butonuna tıklanınca ilgili sayfayı yeni pencerede açıyoruz.
     document.getElementById('afad-btn').addEventListener('click', function() {
       window.open("https://deprem.afad.gov.tr/last-earthquakes.html", "_blank");
+    });
+
+    // "USGS son depremler" butonuna tıklanınca ilgili sayfayı yeni pencerede açıyoruz.
+    document.getElementById('usgs-btn').addEventListener('click', function() {
+      window.open("https://earthquake.usgs.gov/earthquakes/map/", "_blank");
     });
   </script>
 </body>
