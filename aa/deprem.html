@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -176,9 +175,12 @@
       });
       labelMarker = L.marker([lat, lon], { icon: labelIcon, interactive: false }).addTo(map);
 
+      // Ondalık sayı girilmişse, büyüklük değerindeki noktaları virgülle değiştirelim.
+      var formattedMagnitude = magnitude.toString().replace(/\./g, ',');
+
       // Deprem büyüklüğünü, kırmızı arka plan üzerinde beyaz, dikdörtgen biçimde gösteren etiket
       var magnitudeIcon = L.divIcon({
-        html: '<div style="font-family: \'Causten-Black\'; font-size: 40px; font-weight: bold; color: red; background: white; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, 80%); white-space: nowrap; line-height: 1; margin: 0;">' + magnitude + '</div>',
+        html: '<div style="font-family: \'Causten-Black\'; font-size: 40px; font-weight: bold; color: red; background: white; padding: 3px 3px; display: inline-block; border-radius: 5px; transform: translate(-50%, 80%); white-space: nowrap; line-height: 1; margin: 0;">' + formattedMagnitude + '</div>',
         className: '',
         iconSize: [0, 0]
       });
