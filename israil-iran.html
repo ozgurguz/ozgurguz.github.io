@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>İsrail-İran Çatışma Haritası</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; }
+    #map { width: 100%; height: 100vh; position: relative; }
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 5px;
+      border-radius: 4px;
+    }
+    #toggle {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .explosion {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255,0,0,0.7);
+      position: absolute;
+      pointer-events: none;
+      animation: explode 3s ease-out forwards;
+    }
+    @keyframes explode {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(5); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="controls">
+    <button id="toggle">▶</button>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Tabletop.js for Google Sheets -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.4/tabletop.min.js"></script>
+  <script>
+    const totalDuration = 20000; // 20 saniye
+    let events = [], minDate, maxDate;
+    let startTimestamp = 0, elapsedTime = 0, eventIndex = 0;
+    let playing = false, rafId;
+    let map;
+
+    window.addEventListener('load', () => {
+      if (typeof Tabletop === 'undefined') {
+        console.error('Tabletop yüklenemedi.');
+        return;
+      }
+      Tabletop.init({
+        key: '1BBf6-Eft0Y8pvpsoLjVT4xCYNTwZv9UVzTmxRKCp_4I',
+        callback: initMap,
+        simpleSheet: true
+      });
+    });
+
+    function initMap(data) {
+      map = L.map('map').setView([31.5, 35], 5);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      data.forEach(r => { r.dateObj = new Date(r.C); }); // C sütunu tarih
+      minDate = Math.min(...data.map(r => r.dateObj.getTime()));
+      maxDate = Math.max(...data.map(r => r.dateObj.getTime()));
+
+      events = data.map(r => ({
+        lat: parseFloat(r.A),      // A sütunu latitude
+        lng: parseFloat(r.B),      // B sütunu longitude
+        time: ((r.dateObj.getTime() - minDate) / (maxDate - minDate)) * totalDuration
+      })).sort((a, b) => a.time - b.time);
+
+      document.getElementById('toggle').addEventListener('click', togglePlayback);
+    }
+
+    function triggerExplosion(e) {
+      const point = map.latLngToContainerPoint([e.lat, e.lng]);
+      const el = document.createElement('div');
+      el.className = 'explosion';
+      el.style.left = (point.x - 10) + 'px';
+      el.style.top = (point.y - 10) + 'px';
+      document.getElementById('map').appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+
+    function animationStep() {
+      const now = Date.now() - startTimestamp;
+      elapsedTime = now;
+      while (eventIndex < events.length && events[eventIndex].time <= now) {
+        triggerExplosion(events[eventIndex]);
+        eventIndex++;
+      }
+      if (now < totalDuration && playing) {
+        rafId = requestAnimationFrame(animationStep);
+      } else {
+        stopPlayback();
+      }
+    }
+
+    function startPlayback() {
+      if (elapsedTime >= totalDuration) {
+        elapsedTime = 0;
+        eventIndex = 0;
+      }
+      startTimestamp = Date.now() - elapsedTime;
+      playing = true;
+      document.getElementById('toggle').textContent = '❚❚';
+      rafId = requestAnimationFrame(animationStep);
+    }
+
+    function stopPlayback() {
+      playing = false;
+      cancelAnimationFrame(rafId);
+      document.getElementById('toggle').textContent = '▶';
+    }
+
+    function togglePlayback() {
+      if (playing) {
+        stopPlayback();
+      } else {
+        startPlayback();
+      }
+    }
+  </script>
+</body>
+</html>
