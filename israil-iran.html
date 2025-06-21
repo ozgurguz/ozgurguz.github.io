@@ -58,20 +58,16 @@
     let map;
 
     window.addEventListener('load', () => {
-      // Google Sheets veri çek
       fetch(SHEET_URL)
         .then(resp => resp.text())
         .then(text => {
-          // callback içerisindeki JSON'i çıkar
-          const jsonText = text.match(/google\.visualization\.Query\.setResponse\((.*)\)/s);
-          if (!jsonText || !jsonText[1]) throw new Error('Gelen veri parse edilemedi');
-          const data = JSON.parse(jsonText[1]).table;
-          const cols = data.cols.map(c => c.label);
-          const rows = data.rows.map(r => {
+          const match = text.match(/google\.visualization\.Query\.setResponse\((.*)\)/s);
+          if (!match) throw new Error('Veri parse edilemedi');
+          const table = JSON.parse(match[1]).table;
+          const cols = table.cols.map(c => c.label.toLowerCase());
+          const rows = table.rows.map(r => {
             const obj = {};
-            r.c.forEach((cell, i) => {
-              obj[cols[i]] = cell ? cell.v : null;
-            });
+            r.c.forEach((cell, i) => obj[cols[i]] = cell ? cell.v : null);
             return obj;
           });
           initMap(rows);
@@ -80,19 +76,20 @@
     });
 
     function initMap(data) {
+      // Wikimedia osm-intl stili: yerel dillerde etiketler
       map = L.map('map').setView([31.5, 35], 5);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
+      L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors, Wikimedia',
+        maxZoom: 18
       }).addTo(map);
 
-      // Tarih sütunu C (örneğin header 'tarih')
-      data.forEach(r => r.dateObj = new Date(r.tarih || r.date));
+      data.forEach(r => r.dateObj = new Date(r['tarih'] || r['date']));
       minDate = Math.min(...data.map(r => r.dateObj.getTime()));
       maxDate = Math.max(...data.map(r => r.dateObj.getTime()));
 
       events = data.map(r => ({
-        lat: parseFloat(r.latitude || r.Latitude || r.A),
-        lng: parseFloat(r.longtitude || r.Longitude || r.B),
+        lat: parseFloat(r['latitude'] || r['a']),
+        lng: parseFloat(r['longtitude'] || r['b']),
         time: ((r.dateObj.getTime() - minDate) / (maxDate - minDate)) * totalDuration
       })).sort((a, b) => a.time - b.time);
 
@@ -116,18 +113,12 @@
         triggerExplosion(events[eventIndex]);
         eventIndex++;
       }
-      if (now < totalDuration && playing) {
-        rafId = requestAnimationFrame(animationStep);
-      } else {
-        stopPlayback();
-      }
+      if (now < totalDuration && playing) rafId = requestAnimationFrame(animationStep);
+      else stopPlayback();
     }
 
     function startPlayback() {
-      if (elapsedTime >= totalDuration) {
-        elapsedTime = 0;
-        eventIndex = 0;
-      }
+      if (elapsedTime >= totalDuration) { elapsedTime = 0; eventIndex = 0; }
       startTimestamp = Date.now() - elapsedTime;
       playing = true;
       document.getElementById('toggle').textContent = '❚❚';
@@ -140,9 +131,7 @@
       document.getElementById('toggle').textContent = '▶';
     }
 
-    function togglePlayback() {
-      if (playing) stopPlayback(); else startPlayback();
-    }
+    function togglePlayback() { playing ? stopPlayback() : startPlayback(); }
   </script>
 </body>
 </html>
