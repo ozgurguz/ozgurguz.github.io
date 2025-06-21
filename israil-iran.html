@@ -47,25 +47,36 @@
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <!-- Tabletop.js for Google Sheets -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.4/tabletop.min.js"></script>
   <script>
-    const totalDuration = 20000; // 20 saniye
+    const SHEET_KEY = '1BBf6-Eft0Y8pvpsoLjVT4xCYNTwZv9UVzTmxRKCp_4I';
+    const GID = '0';
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_KEY}/gviz/tq?gid=${GID}&headers=1`;
+    const totalDuration = 20000; // 20 saniye animasyon
     let events = [], minDate, maxDate;
     let startTimestamp = 0, elapsedTime = 0, eventIndex = 0;
     let playing = false, rafId;
     let map;
 
     window.addEventListener('load', () => {
-      if (typeof Tabletop === 'undefined') {
-        console.error('Tabletop yüklenemedi.');
-        return;
-      }
-      Tabletop.init({
-        key: '1BBf6-Eft0Y8pvpsoLjVT4xCYNTwZv9UVzTmxRKCp_4I',
-        callback: initMap,
-        simpleSheet: true
-      });
+      // Google Sheets veri çek
+      fetch(SHEET_URL)
+        .then(resp => resp.text())
+        .then(text => {
+          // callback içerisindeki JSON'i çıkar
+          const jsonText = text.match(/google\.visualization\.Query\.setResponse\((.*)\)/s);
+          if (!jsonText || !jsonText[1]) throw new Error('Gelen veri parse edilemedi');
+          const data = JSON.parse(jsonText[1]).table;
+          const cols = data.cols.map(c => c.label);
+          const rows = data.rows.map(r => {
+            const obj = {};
+            r.c.forEach((cell, i) => {
+              obj[cols[i]] = cell ? cell.v : null;
+            });
+            return obj;
+          });
+          initMap(rows);
+        })
+        .catch(err => console.error('Sheet yükleme hatası:', err));
     });
 
     function initMap(data) {
@@ -74,13 +85,14 @@
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
 
-      data.forEach(r => { r.dateObj = new Date(r.C); }); // C sütunu tarih
+      // Tarih sütunu C (örneğin header 'tarih')
+      data.forEach(r => r.dateObj = new Date(r.tarih || r.date));
       minDate = Math.min(...data.map(r => r.dateObj.getTime()));
       maxDate = Math.max(...data.map(r => r.dateObj.getTime()));
 
       events = data.map(r => ({
-        lat: parseFloat(r.A),      // A sütunu latitude
-        lng: parseFloat(r.B),      // B sütunu longitude
+        lat: parseFloat(r.latitude || r.Latitude || r.A),
+        lng: parseFloat(r.longtitude || r.Longitude || r.B),
         time: ((r.dateObj.getTime() - minDate) / (maxDate - minDate)) * totalDuration
       })).sort((a, b) => a.time - b.time);
 
@@ -129,11 +141,7 @@
     }
 
     function togglePlayback() {
-      if (playing) {
-        stopPlayback();
-      } else {
-        startPlayback();
-      }
+      if (playing) stopPlayback(); else startPlayback();
     }
   </script>
 </body>
