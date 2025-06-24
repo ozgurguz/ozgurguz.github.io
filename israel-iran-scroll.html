@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>İsrail-İran Çatışma Haritası</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/scrollama"></script>
+<style>
+  body { margin:0; font-family: sans-serif; }
+  #map { position: fixed; top:0; left:0; width:100%; height:100%; }
+  #story { position: relative; z-index: 1000; width: 100%; }
+  .step { min-height: 100vh; display: flex; align-items: center; justify-content:center; font-size: 2em; color:#fff; }
+  .step:nth-child(odd) { background: rgba(0,0,0,0.4); }
+  .explosion { width:20px; height:20px; border-radius:50%; background:rgba(255,0,0,0.7); position:absolute; pointer-events:none; animation:explode 3s ease-out forwards; }
+  @keyframes explode { 0%{transform:scale(0.5);opacity:1;} 100%{transform:scale(5);opacity:0;} }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="story"></div>
+<script>
+const events = 
+[
+  {
+    "city": "Tahran",
+    "country": "İran",
+    "lat": 35.723,
+    "lng": 51.346,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Tel Aviv",
+    "country": "İsrail",
+    "lat": 32.082,
+    "lng": 34.769824,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Tel Aviv",
+    "country": "İsrail",
+    "lat": 32.072,
+    "lng": 34.759824,
+    "date": "15 Haziran 2025"
+  },
+  {
+    "city": "Natanz",
+    "country": "İran",
+    "lat": 33.50862,
+    "lng": 51.91251,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Tebriz",
+    "country": "İran",
+    "lat": 38.08297,
+    "lng": 46.29412,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Isfahan",
+    "country": "İran",
+    "lat": 32.66016,
+    "lng": 51.67251,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Kirmanşah",
+    "country": "İran",
+    "lat": 34.328,
+    "lng": 47.084,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Hemedan",
+    "country": "İran",
+    "lat": 34.80171,
+    "lng": 48.512,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Loristan",
+    "country": "İran",
+    "lat": 33.862,
+    "lng": 48.07455,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Kum",
+    "country": "İran",
+    "lat": 34.63707,
+    "lng": 50.87814,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Huzistan",
+    "country": "İran",
+    "lat": 31.32375,
+    "lng": 48.664,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Siraz",
+    "country": "İran",
+    "lat": 29.601,
+    "lng": 52.57,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Tahran",
+    "country": "Iran",
+    "lat": 35.72307162,
+    "lng": 51.34626784,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Natanz",
+    "country": "Iran",
+    "lat": 33.50862175,
+    "lng": 51.91251182,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Tebriz",
+    "country": "Iran",
+    "lat": 38.0829715,
+    "lng": 46.29412865,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Isfahan",
+    "country": "Iran",
+    "lat": 32.66016923,
+    "lng": 51.67251022,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Kirmanşah",
+    "country": "Iran",
+    "lat": 34.3287368,
+    "lng": 47.08419684,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Hemedan",
+    "country": "Iran",
+    "lat": 34.80171887,
+    "lng": 48.51207782,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Loristan",
+    "country": "Iran",
+    "lat": 33.86201147,
+    "lng": 48.07455949,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Kum",
+    "country": "Iran",
+    "lat": 34.63707685,
+    "lng": 50.87814334,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Huzistan",
+    "country": "Iran",
+    "lat": 31.32375109,
+    "lng": 48.66431476,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Siraz",
+    "country": "Iran",
+    "lat": 29.60147017,
+    "lng": 52.5702094,
+    "date": "13 Haziran 2025"
+  },
+  {
+    "city": "Tel Aviv",
+    "country": "Israel",
+    "lat": 32.08208716,
+    "lng": 34.78556936,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Ramat Gan",
+    "country": "Israel",
+    "lat": 32.06755758,
+    "lng": 34.82406586,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Gush Dan",
+    "country": "Israel",
+    "lat": 32.12106692,
+    "lng": 34.8652999,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Rishon Lezion",
+    "country": "Israel",
+    "lat": 31.95837191,
+    "lng": 34.79915696,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "İsfahan",
+    "country": "Iran",
+    "lat": 32.66016923,
+    "lng": 51.67251022,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Tahran",
+    "country": "Iran",
+    "lat": 35.72307162,
+    "lng": 51.34626784,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Doğu Azerbaycan",
+    "country": "Iran",
+    "lat": 39.31279908,
+    "lng": 47.36788619,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Tebriz",
+    "country": "Iran",
+    "lat": 33.86201147,
+    "lng": 48.07455949,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Batı Azerbaycan",
+    "country": "Iran",
+    "lat": 34.63707685,
+    "lng": 50.87814334,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Hürmüzgan",
+    "country": "Iran",
+    "lat": 31.32375109,
+    "lng": 48.66431476,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Kirmanşah",
+    "country": "Iran",
+    "lat": 34.3287368,
+    "lng": 47.08419684,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Loristan",
+    "country": "Iran",
+    "lat": 33.86201147,
+    "lng": 48.07455949,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Huzistan",
+    "country": "Iran",
+    "lat": 31.32375109,
+    "lng": 48.66431476,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Hürremabad",
+    "country": "Iran",
+    "lat": 33.48296314,
+    "lng": 48.35892519,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Buşehr",
+    "country": "Iran",
+    "lat": 28.91835378,
+    "lng": 50.82659943,
+    "date": "14 Haziran 2025"
+  },
+  {
+    "city": "Hayfa",
+    "country": "Israel",
+    "lat": 32.79433113,
+    "lng": 34.98241808,
+    "date": "15 Haziran 2025"
+  },
+  {
+    "city": "Tel Aviv",
+    "country": "Israel",
+    "lat": 32.08208716,
+    "lng": 34.78556936,
+    "date": "15 Haziran 2025"
+  },
+  {
+    "city": "Rehovot",
+    "country": "Israel",
+    "lat": 31.89324466,
+    "lng": 34.81321447,
+    "date": "15 Haziran 2025"
+  },
+  {
+    "city": "Bat Yam",
+    "country": "Israel",
+    "lat": 32.01542853,
+    "lng": 34.75194997,
+    "date": "15 Haziran 2025"
+  },
+  {
+    "city": "Tahran",
+    "country": "Iran",
+    "lat": 35.72307162,
+    "lng": 51.34626784,
+    "date": "15 Haziran 2025"
+  },
+  {
+    "city": "İsfahan",
+    "country": "Iran",
+    "lat": 32.66016923,
+    "lng": 51.67251022,
+    "date": "15 Haziran 2025"
+  },
+  {
+    "city": "Şiraz",
+    "country": "Iran",
+    "lat": 29.60684327,
+    "lng": 52.57982143,
+    "date": "15 Haziran 2025"
+  },
+  {
+    "city": "Meşhed",
+    "country": "Iran",
+    "lat": 36.30964558,
+    "lng": 59.59446145,
+    "date": "15 Haziran 2025"
+  },
+  {
+    "city": "Natanz",
+    "country": "Iran",
+    "lat": 33.50862175,
+    "lng": 51.91251182,
+    "date": "16 Haziran 2025"
+  },
+  {
+    "city": "Kirmanşah",
+    "country": "Iran",
+    "lat": 34.3287368,
+    "lng": 47.08419684,
+    "date": "16 Haziran 2025"
+  },
+  {
+    "city": "Tahran",
+    "country": "Iran",
+    "lat": 35.72307162,
+    "lng": 51.34626784,
+    "date": "16 Haziran 2025"
+  },
+  {
+    "city": "Tebriz",
+    "country": "Iran",
+    "lat": 38.0829715,
+    "lng": 46.29412865,
+    "date": "16 Haziran 2025"
+  },
+  {
+    "city": "İsfahan",
+    "country": "Israel",
+    "lat": 32.66016923,
+    "lng": 51.67251022,
+    "date": "16 Haziran 2025"
+  },
+  {
+    "city": "Tel Aviv",
+    "country": "Israel",
+    "lat": 32.08208716,
+    "lng": 34.78556936,
+    "date": "16 Haziran 2025"
+  },
+  {
+    "city": "Kiryat Got",
+    "country": "Israel",
+    "lat": 31.61104141,
+    "lng": 34.7729903,
+    "date": "16 Haziran 2025"
+  },
+  {
+    "city": "Gush Dan",
+    "country": "Israel",
+    "lat": 32.11292502,
+    "lng": 34.84195297,
+    "date": "16 Haziran 2025"
+  },
+  {
+    "city": "Petah Tikva",
+    "country": "Israel",
+    "lat": 32.08249329,
+    "lng": 34.88718457,
+    "date": "16 Haziran 2025"
+  },
+  {
+    "city": "Bnei Brak",
+    "country": "Israel",
+    "lat": 32.08442432,
+    "lng": 34.8356412,
+    "date": "16 Haziran 2025"
+  },
+  {
+    "city": "Hayfa",
+    "country": "Israel",
+    "lat": 32.79433113,
+    "lng": 34.98241808,
+    "date": "16 Haziran 2025"
+  },
+  {
+    "city": "Tebriz",
+    "country": "Iran",
+    "lat": 38.0829715,
+    "lng": 46.29412865,
+    "date": "17 Haziran 2025"
+  },
+  {
+    "city": "Kaşan",
+    "country": "Iran",
+    "lat": 33.99273103,
+    "lng": 51.42489082,
+    "date": "17 Haziran 2025"
+  },
+  {
+    "city": "Tahran",
+    "country": "Iran",
+    "lat": 35.72307162,
+    "lng": 51.34626784,
+    "date": "17 Haziran 2025"
+  },
+  {
+    "city": "Doğu Azerbaycan",
+    "country": "Iran",
+    "lat": 39.31279908,
+    "lng": 47.36788619,
+    "date": "17 Haziran 2025"
+  },
+  {
+    "city": "Tel Aviv",
+    "country": "Israel",
+    "lat": 32.08208716,
+    "lng": 34.78556936,
+    "date": "17 Haziran 2025"
+  },
+  {
+    "city": "Herzilya",
+    "country": "Israel",
+    "lat": 32.16218229,
+    "lng": 34.84584988,
+    "date": "17 Haziran 2025"
+  },
+  {
+    "city": "Tahran",
+    "country": "Iran",
+    "lat": 35.72307162,
+    "lng": 51.34626784,
+    "date": "18 Haziran 2025"
+  },
+  {
+    "city": "Tebriz",
+    "country": "Iran",
+    "lat": 38.0829715,
+    "lng": 46.29412865,
+    "date": "18 Haziran 2025"
+  },
+  {
+    "city": "İlam",
+    "country": "Iran",
+    "lat": 33.63577548,
+    "lng": 46.41452239,
+    "date": "18 Haziran 2025"
+  },
+  {
+    "city": "Meşhed",
+    "country": "Iran",
+    "lat": 36.30964558,
+    "lng": 59.59446145,
+    "date": "18 Haziran 2025"
+  },
+  {
+    "city": "Tahran",
+    "country": "Iran",
+    "lat": 35.72307162,
+    "lng": 51.34626784,
+    "date": "18 Haziran 2025"
+  },
+  {
+    "city": "Kirmanşah",
+    "country": "Iran",
+    "lat": 34.3287368,
+    "lng": 47.08419684,
+    "date": "18 Haziran 2025"
+  },
+  {
+    "city": "Erdebil",
+    "country": "Iran",
+    "lat": 38.24545783,
+    "lng": 48.29801454,
+    "date": "18 Haziran 2025"
+  },
+  {
+    "city": "Zencan",
+    "country": "Iran",
+    "lat": 36.68374548,
+    "lng": 48.50763893,
+    "date": "18 Haziran 2025"
+  },
+  {
+    "city": "Kerec",
+    "country": "Iran",
+    "lat": 35.8481455,
+    "lng": 50.96308888,
+    "date": "18 Haziran 2025"
+  },
+  {
+    "city": "Tel Aviv",
+    "country": "Israel",
+    "lat": 32.08208716,
+    "lng": 34.78556936,
+    "date": "18 Haziran 2025"
+  },
+  {
+    "city": "Erak",
+    "country": "Israel",
+    "lat": 34.08764723,
+    "lng": 49.70908774,
+    "date": "19 Haziran 2025"
+  },
+  {
+    "city": "Tahran",
+    "country": "Iran",
+    "lat": 35.72307162,
+    "lng": 51.34626784,
+    "date": "19 Haziran 2025"
+  },
+  {
+    "city": "Tel Aviv",
+    "country": "Israel",
+    "lat": 32.08208716,
+    "lng": 34.78556936,
+    "date": "19 Haziran 2025"
+  },
+  {
+    "city": "Ramat Gan",
+    "country": "Israel",
+    "lat": 32.06946585,
+    "lng": 34.82664588,
+    "date": "19 Haziran 2025"
+  },
+  {
+    "city": "Holon Bölgesi",
+    "country": "Israel",
+    "lat": 32.01767298,
+    "lng": 34.77073767,
+    "date": "19 Haziran 2025"
+  },
+  {
+    "city": "Birüssebi",
+    "country": "Iran",
+    "lat": 31.25292357,
+    "lng": 34.7901994,
+    "date": "19 Haziran 2025"
+  },
+  {
+    "city": "Necef",
+    "country": "Iran",
+    "lat": 32.03947289,
+    "lng": 44.32496358,
+    "date": "19 Haziran 2025"
+  },
+  {
+    "city": "Azadşehir",
+    "country": "Iran",
+    "lat": 37.08889486,
+    "lng": 55.17262419,
+    "date": "20 Haziran 2025"
+  },
+  {
+    "city": "Reşt",
+    "country": "Iran",
+    "lat": 37.27125092,
+    "lng": 49.59416421,
+    "date": "20 Haziran 2025"
+  },
+  {
+    "city": "Tebriz",
+    "country": "Iran",
+    "lat": 38.0829715,
+    "lng": 46.29412865,
+    "date": "20 Haziran 2025"
+  },
+  {
+    "city": "Tahran",
+    "country": "Iran",
+    "lat": 35.72307162,
+    "lng": 51.34626784,
+    "date": "20 Haziran 2025"
+  },
+  {
+    "city": "Birüssebi",
+    "country": "Israel",
+    "lat": 31.25292357,
+    "lng": 34.7901994,
+    "date": "20 Haziran 2025"
+  },
+  {
+    "city": "Hayfa",
+    "country": "Israel",
+    "lat": 32.79433113,
+    "lng": 34.98241808,
+    "date": "20 Haziran 2025"
+  },
+  {
+    "city": "Telaviv",
+    "country": "Israel",
+    "lat": 32.08208716,
+    "lng": 34.78556936,
+    "date": "20 Haziran 2025"
+  }
+]
+;
+const grouped = {};
+events.forEach(e => {
+  (grouped[e.date] = grouped[e.date] || []).push(e);
+});
+const dates = Object.keys(grouped);
+const story = document.getElementById('story');
+dates.forEach(d => {
+  const step = document.createElement('section');
+  step.className = 'step';
+  step.dataset.date = d;
+  step.textContent = d;
+  story.appendChild(step);
+});
+
+const map = L.map('map').setView([32, 50], 6);
+L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png', {maxZoom:18, attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+
+function triggerExplosion(lat, lng) {
+  const pt = map.latLngToContainerPoint([lat, lng]);
+  const el = document.createElement('div');
+  el.className = 'explosion';
+  el.style.left = (pt.x - 10) + 'px';
+  el.style.top = (pt.y - 10) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+function showDate(d) {
+  grouped[d].forEach(ev => triggerExplosion(ev.lat, ev.lng));
+}
+
+const scroller = scrollama();
+scroller.setup({step:'.step',offset:0.5}).onStepEnter(r => showDate(r.element.dataset.date));
+</script>
+</body>
+</html>
